@@ -4,22 +4,36 @@
   "main": "index.ts",
   "license": "MIT",
   "dependencies": {
+    "@types/bcryptjs": "^3.0.0",
     "@types/express": "^5.0.1",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/mongoose": "^5.11.97",
     "@types/node": "^22.15.2",
+    "@types/node-pg-migrate": "^2.3.1",
+    "@types/pg": "^8.11.14",
     "cross-env": "^7.0.3",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.14.0",
+    "node-pg-migrate": "^7.9.1",
     "nodemon": "^3.1.10",
+    "pg": "^8.15.6",
     "rimraf": "^6.0.1",
     "typescript": "^5.8.3"
   },
   "scripts": {
     "build": "rimraf dist && tsc",
     "predev": "yarn build",
-    "dev": "nodemon -q dist/index.js",
+    "dev": "nodemon --watch src --ext ts,json --exec ts-node src/index.ts",
     "prestart": "yarn build",
     "start": "cross-env NODE_ENV=production node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "migrate": "node-pg-migrate up",
+    "migrate:rollback": "node-pg-migrate down"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2"
   }
 }

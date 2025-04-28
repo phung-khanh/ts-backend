@@ -1,22 +1,30 @@
-import express, { Express, Request, Response } from "express";
-import errorMiddleware from "./middlewares/error.middleware";
-import userRoutes from "./routes/user.routes";
-import { sendResponse } from "./utils/responseFormatter";
+import cors from "cors";
+import dotenv from "dotenv";
+import express from "express";
+import helmet from "helmet";
+import morgan from "morgan";
+import router from "./routes/index";
 
-const app: Express = express();
+dotenv.config();
 
-// Middleware
-app.use(express.json());
+const app = express();
 
-// Routes
-app.use("/api/users", userRoutes);
+const allowedOrigins = [process.env.FRONTEND_URL].filter(
+  (origin) => origin !== undefined
+);
 
-// Global error handler
-app.use(errorMiddleware);
+app.use(helmet());
+app.use(morgan("dev"));
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
 
-// Optional: If you want a general route to test
-app.get("/", (req: Request, res: Response) => {
-  sendResponse(res, 200, true, null, "API is running smoothly...");
-});
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  })
+);
+
+app.use("/api", router);
 
 export default app;

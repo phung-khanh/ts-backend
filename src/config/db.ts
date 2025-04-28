@@ -1,20 +1,13 @@
-import dotenv from "dotenv";
-import { Pool } from "pg";
+import mongoose from "mongoose";
 
-dotenv.config();
+const connectDB = async () => {
+  try {
+    if (!process.env.DB_URL) throw new Error("DB_URL is not defined");
+    await mongoose.connect(process.env.DB_URL);
+    console.log("Connect DB successfully");
+  } catch (error) {
+    console.log("Connect DB failed");
+  }
+};
 
-const { DB_USER, DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT, NODE_ENV } =
-  process.env;
-
-if (!DB_USER || !DB_HOST || !DB_NAME || !DB_PASSWORD || !DB_PORT) {
-  throw new Error("Missing database environment variables!");
-}
-
-export const database = new Pool({
-  user: DB_USER,
-  host: DB_HOST,
-  database: DB_NAME,
-  password: DB_PASSWORD,
-  port: Number(DB_PORT),
-  ssl: NODE_ENV === "production" ? { rejectUnauthorized: false } : false, // Cấu hình SSL tùy thuộc vào môi trường
-});
+export default connectDB;

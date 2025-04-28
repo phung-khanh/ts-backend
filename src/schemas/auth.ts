@@ -24,7 +24,3 @@ export const resetPasswordSchema = yup.object().shape({
   otp: yup.string().length(6, "OTP must be exactly 6 characters").required(),
   newPassword: yup.string().min(8).required(),
 });
-
-export const googleSignUpSchema = yup.object().shape({
-  token: yup.string().required(),
-});

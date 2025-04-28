@@ -1,7 +1,7 @@
 import { model, Schema } from "mongoose";
 import { IPassword } from "../interfaces/password.interface";
 
-const passwordResetSchema = new Schema<IPassword>({
+const resetPasswordSchema = new Schema<IPassword>({
   email: {
     type: String,
     required: true,
@@ -16,5 +16,5 @@ const passwordResetSchema = new Schema<IPassword>({
   },
 });
 
-const PasswordReset = model<IPassword>("passwordResets", passwordResetSchema);
+const PasswordReset = model<IPassword>("resetPassword", resetPasswordSchema);
 export default PasswordReset;

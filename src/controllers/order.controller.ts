@@ -86,3 +86,13 @@ export const updateStatus = asyncHandler(
     }
   }
 );
+
+const OrderController = {
+  createOrder,
+  getAllOrders,
+  myOrders,
+  getOrder,
+  updateStatus,
+};
+
+export default OrderController;

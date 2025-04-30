@@ -1,23 +1,10 @@
-import Category from "../models/category.model";
-import Product from "../models/product.model";
+import * as ProductService from "../services/product.service";
 import { asyncHandler } from "../utils/asyncHandler";
 
 export const getProducts = asyncHandler(async (req, res) => {
   try {
     const { search } = req.query;
-    const queryObj: { name?: { $regex: RegExp } } = {};
-    if (search) {
-      const nameRegex = new RegExp(search as string, "i");
-      queryObj.name = {
-        $regex: nameRegex,
-      };
-    }
-
-    const products = await Product.find(queryObj)
-      .populate(["category", "posts"])
-      .sort("-createdAt")
-      .exec();
-
+    const products = await ProductService.getProducts(search as string);
     res.json(products);
   } catch (error: any) {
     res.status(500).json({
@@ -29,18 +16,7 @@ export const getProducts = asyncHandler(async (req, res) => {
 
 export const getProductsHome = asyncHandler(async (req, res) => {
   try {
-    const categories = await Category.find().exec();
-    const products = await Promise.all(
-      categories.map(async (it) => {
-        const products = await Product.find({ category: it._id }).exec();
-
-        return {
-          ...it.toJSON(),
-          products,
-        };
-      })
-    );
-
+    const products = await ProductService.getProductsHome();
     res.json(products);
   } catch (error: any) {
     res.status(500).json({
@@ -52,28 +28,8 @@ export const getProductsHome = asyncHandler(async (req, res) => {
 
 export const getRelatedProducts = asyncHandler(async (req, res) => {
   const { id } = req.params;
-
   try {
-    const product = await Product.findById(id).exec();
-    if (!product) {
-      return res.status(404).json({
-        message: "Product not found",
-      });
-    }
-
-    const productsRelated = await Product.find({
-      $and: [
-        {
-          _id: { $ne: product._id },
-        },
-        {
-          category: product.category,
-        },
-      ],
-    })
-      .populate(["category", "posts"])
-      .exec();
-
+    const productsRelated = await ProductService.getRelatedProducts(id);
     res.json(productsRelated);
   } catch (error: any) {
     res.status(500).json({
@@ -85,27 +41,7 @@ export const getRelatedProducts = asyncHandler(async (req, res) => {
 
 export const createProduct = asyncHandler(async (req, res) => {
   try {
-    const {
-      name,
-      image,
-      price,
-      salePrice,
-      category,
-      description,
-      brand,
-      posts,
-    } = req.body;
-    const product = await new Product({
-      name,
-      image,
-      price,
-      salePrice,
-      category,
-      description,
-      brand,
-      posts,
-    }).save();
-
+    const product = await ProductService.createProduct(req.body);
     res.status(201).json(product);
   } catch (error: any) {
     res.status(500).json({
@@ -118,17 +54,7 @@ export const createProduct = asyncHandler(async (req, res) => {
 export const getProduct = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params;
-
-    const product = await Product.findByIdAndUpdate(
-      id,
-      {
-        $inc: { view: 1 },
-      },
-      { new: true }
-    )
-      .populate(["category", "posts"])
-      .exec();
-
+    const product = await ProductService.getProduct(id);
     res.json(product);
   } catch (error: any) {
     res.status(500).json({
@@ -141,32 +67,7 @@ export const getProduct = asyncHandler(async (req, res) => {
 export const updateProduct = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params;
-    const {
-      name,
-      image,
-      price,
-      salePrice,
-      category,
-      description,
-      brand,
-      posts,
-    } = req.body;
-
-    const product = await Product.findByIdAndUpdate(
-      id,
-      {
-        name,
-        image,
-        price,
-        salePrice,
-        category,
-        description,
-        brand,
-        posts,
-      },
-      { new: true }
-    ).exec();
-
+    const product = await ProductService.updateProduct(id, req.body);
     res.json(product);
   } catch (error: any) {
     res.status(500).json({
@@ -179,9 +80,7 @@ export const updateProduct = asyncHandler(async (req, res) => {
 export const deleteProduct = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params;
-
-    const product = await Product.findByIdAndDelete(id).exec();
-
+    const product = await ProductService.deleteProduct(id);
     res.json(product);
   } catch (error: any) {
     res.status(500).json({

@@ -1,87 +1,50 @@
-import Category from "../models/category.model";
+import { Request, Response } from "express";
+import * as categoryService from "../services/category.service";
 import { asyncHandler } from "../utils/asyncHandler";
 
-export const getCategories = asyncHandler(async (req, res) => {
-  try {
-    const categories = await Category.find().sort("-createdAt").exec();
-
-    if (!categories) res.status(404).json({ message: "Categories not found" });
-
+export const getCategories = asyncHandler(
+  async (req: Request, res: Response) => {
+    const categories = await categoryService.getCategoriesService();
+    if (!categories) {
+      return res.status(404).json({ message: "Categories not found" });
+    }
     res.json(categories);
-  } catch (error: any) {
-    res.status(500).json({
-      message: "Internal server error",
-      error: error.message,
-    });
   }
-});
+);
 
-export const createCategory = asyncHandler(async (req, res) => {
-  try {
+export const createCategory = asyncHandler(
+  async (req: Request, res: Response) => {
     const { name, image } = req.body;
-    const category = await new Category({ name, image }).save();
-
+    const category = await categoryService.createCategoryService(name, image);
     res.status(201).json(category);
-  } catch (error: any) {
-    res.status(500).json({
-      message: "Internal server error",
-      error: error.message,
-    });
   }
+);
+
+export const getCategory = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const category = await categoryService.getCategoryService(id);
+  res.json(category);
 });
 
-export const getCategory = asyncHandler(async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const category = await Category.findById(id).exec();
-
-    res.json(category);
-  } catch (error: any) {
-    res.status(500).json({
-      message: "Internal server error",
-      error: error.message,
-    });
-  }
-});
-
-export const updateCategory = asyncHandler(async (req, res) => {
-  try {
+export const updateCategory = asyncHandler(
+  async (req: Request, res: Response) => {
     const { id } = req.params;
     const { name, image } = req.body;
-
-    const category = await Category.findByIdAndUpdate(
-      id,
-      {
-        name,
-        image,
-      },
-      { new: true }
-    ).exec();
-
-    res.json(category);
-  } catch (error: any) {
-    res.status(500).json({
-      message: "Internal server error",
-      error: error.message,
+    const category = await categoryService.updateCategoryService(id, {
+      name,
+      image,
     });
+    res.json(category);
   }
-});
+);
 
-export const deleteCategory = asyncHandler(async (req, res) => {
-  try {
+export const deleteCategory = asyncHandler(
+  async (req: Request, res: Response) => {
     const { id } = req.params;
-
-    const category = await Category.findByIdAndDelete(id).exec();
-
+    const category = await categoryService.deleteCategoryService(id);
     res.json(category);
-  } catch (error: any) {
-    res.status(500).json({
-      message: "Internal server error",
-      error: error.message,
-    });
   }
-});
+);
 
 const CategoryController = {
   getCategories,

@@ -2,7 +2,6 @@ import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import helmet from "helmet";
-import morgan from "morgan";
 import router from "./routes/index";
 
 dotenv.config();
@@ -14,9 +13,9 @@ const allowedOrigins = [process.env.FRONTEND_URL].filter(
 );
 
 app.use(helmet());
-app.use(morgan("dev"));
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ limit: "10mb", extended: true }));
+// app.use(morgan("dev"));
+// app.use(express.json({ limit: "10mb" }));
+// app.use(express.urlencoded({ limit: "10mb", extended: true }));
 
 app.use(
   cors({
